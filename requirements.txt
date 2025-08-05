@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pydantic
+langchain
+langchain_groq
+langchain_cohere
+langchain_community
+langchain-text-splitters
+pypdf
+faiss-cpu
+rank_bm25
+cohere==5.15.*
+requests
+unstructured
+dotenv
