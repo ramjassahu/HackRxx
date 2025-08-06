@@ -269,18 +269,19 @@ async def process_single_query(ensemble_retriever, llm, query: str) -> str:
     # This prompt is more explicit, provides clear instructions, and tells the LLM
     # what to do if the answer is not found in the context.
     prompt_template = f"""
-    You are an expert assistant. Your task is to answer the user's question based exclusively on the provided documents.The answer must be a maximum of two lines.
+    You are an assistant that answers questions strictly from the provided context.
+Rules:
+- Use ONLY the given context. Do not use external knowledge.
+- Answer in ONE sentence, but include all critical conditions, exceptions, and clauses mentioned in the context.
+- If the answer is not found in the document, provide a one-line response relavent to your knowledge.
 
-    *Instructions:*
-    1.  Read the documents carefully.
-    2.  Formulate a concise and direct answer to the question using only the information from these documents.
+context:
+{relevant_docs}
 
-    *Documents:*
-    <documents>
-    {relevant_docs}
-    </documents>
+Question:
+{query}
 
-    *Question:* {query}
+    
 
     *Answer:*
     """
