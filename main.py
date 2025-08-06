@@ -374,7 +374,9 @@ async def handle_hackrx_request(
         os.remove(temp_file_path)
 
     print("--- All answers received, sending response ---")
-    return answers
+    return {
+        "answers" : answers
+    }
 
 
 # To run this application:hello
