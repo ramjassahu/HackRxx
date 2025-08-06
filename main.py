@@ -295,7 +295,7 @@ Question:
 # In a real application, this key would be stored securely,
 # for example, in an environment variable.
 #--apna--API_KEY = "50255bc08e08f6431861bace6cb7232a1a9c317758fc6afd177cfd01ba3cff9a"
-API_KEY = "a0fe7533f09d10a50c420dba1534851a96cf628062b3700130e993d677c422ad"
+API_KEY = "50255bc08e08f6431861bace6cb7232a1a9c317758fc6afd177cfd01ba3cff9a"
 BEARER_TOKEN = f"Bearer {API_KEY}"
 
 # --- Pydantic Models for Data Validation ---
