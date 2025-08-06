@@ -274,8 +274,6 @@ async def process_single_query(ensemble_retriever, llm, query: str) -> str:
     *Instructions:*
     1.  Read the documents carefully.
     2.  Formulate a concise and direct answer to the question using only the information from these documents.
-    3.  Do not use any external knowledge or make up information.
-    4.  If the answer to the question cannot be found in the provided documents, you must state: "I cannot answer this question based on the provided documents."
 
     *Documents:*
     <documents>
