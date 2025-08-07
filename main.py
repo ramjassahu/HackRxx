@@ -16,6 +16,7 @@ from langchain_community.document_loaders import (
 from dotenv import load_dotenv
 import asyncio
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+import random
 
 load_dotenv()
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -24,13 +25,77 @@ from langchain_community.vectorstores import FAISS
 from langchain.retrievers.ensemble import EnsembleRetriever
 from langchain_groq import ChatGroq
 
-llm = ChatGroq(
-   api_key=os.getenv("GROK_API_KEY"),
+# llm = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY"),
+#     model="meta-llama/llama-4-scout-17b-16e-instruct",
+#     temperature=0,
+# )
+llm_google = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash-lite",  # Or "gemini-1.5-pro" for higher quality
+    temperature=0,
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+)
+# llm_google1 = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash",  # Or "gemini-1.5-pro" for higher quality
+#     temperature=0,
+#     google_api_key=os.getenv("GOOGLE_API_KEY"),
+# )
+# llm_google2 = ChatGoogleGenerativeAI(
+#     model="gemini-2.0-flash-lite",  # Or "gemini-1.5-pro" for higher quality
+#     temperature=0,
+#     google_api_key=os.getenv("GOOGLE_API_KEY"),
+# )
+llm_1 = ChatGroq(
+    api_key=os.getenv("GROK_API_KEY1"),
     model="meta-llama/llama-4-scout-17b-16e-instruct",
     temperature=0,
 )
-
-
+# llm_2 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY2"),
+#     model="gemma2-9b-it",
+#     temperature=0,
+# )
+# llm_3 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY3"),
+#     model="llama-3.3-70b-versatile",
+#     temperature=0,
+# )
+# llm_4 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY4"),
+#     model="meta-llama/llama-guard-4-12b",
+#     temperature=0,
+# )
+# llm_5 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY5"),
+#     model="meta-llama/llama-prompt-guard-2-22m",
+#     temperature=0,
+# )
+# llm_6 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY6"),
+#     model="meta-llama/llama-prompt-guard-2-86m",
+#     temperature=0,
+# )
+# llm_7 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY7"),
+#     model="meta-llama/llama-4-scout-17b-16e-instruct",
+#     temperature=0,
+# )
+# llm_8 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY8"),
+#     model="meta-llama/llama-4-scout-17b-16e-instruct",
+#     temperature=0,
+# )
+# llm_9 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY9"),
+#     model="meta-llama/llama-4-scout-17b-16e-instruct",
+#     temperature=0,
+# )
+# llm_10 = ChatGroq(
+#     api_key=os.getenv("GROK_API_KEY10"),
+#     model="meta-llama/llama-4-scout-17b-16e-instruct",
+#     temperature=0,
+# )
+llms = [llm_1, llm_google]
 # embedding = CohereEmbeddings(
 #     model="embed-english-v3.0",
 #     cohere_api_key=os.getenv("COHERE_API_KEY"),
@@ -401,23 +466,22 @@ import asyncio
 # Assuming other necessary imports like MultiQueryRetriever are already present
 
 
-async def process_single_query(ensemble_retriever, llm, query: str) -> str:
+async def process_single_query(ensemble_retriever, query: str) -> str:
     """
     Asynchronously retrieves documents and generates an answer for a single query.
     If an error occurs, it waits for 1 minute and retries indefinitely.
     """
-    while True:  # This loop will run forever
-        try:
+    
             # Use the asynchronous 'ainvoke' method for non-blocking calls
             # multi_query_ensemble_retriever = MultiQueryRetriever.from_llm(
             #     retriever=ensemble_retriever, llm=llm_r
             # )
-            docs = await ensemble_retriever.ainvoke(query)
-            relevant_docs = "\n\n---\n\n".join([doc.page_content for doc in docs])
+    docs = await ensemble_retriever.ainvoke(query)
+    relevant_docs = "\n\n---\n\n".join([doc.page_content for doc in docs])
 
-            # --- PROMPT TEMPLATE ---
-            prompt_template = f"""
-            You are an assistant that answers questions strictly from the provided context.
+    # --- PROMPT TEMPLATE ---
+    prompt_template = f"""
+    You are an assistant that answers questions strictly from the provided context.
 Rules:
 - Use ONLY the given context. Do not use external knowledge.
 - Answer in max TWO sentence, but include all critical conditions, exceptions, and clauses mentioned in the context.
@@ -429,25 +493,24 @@ context:
 Question:
 {query}
 
-            Answer:
-            """
+    Answer:
+    """
+    llm = random.choice(llms)
+    index = llms.index(llm)
+    print(f"Using: (Index: {index})")
+    # Use the asynchronous 'ainvoke' for the language model call
+    answer = await llm.ainvoke(prompt_template)
+    return (
+        answer.content
+    )  # Success! Exit the loop and function with the answer.
 
-            # Use the asynchronous 'ainvoke' for the language model call
-            answer = await llm.ainvoke(prompt_template)
-            return (
-                answer.content
-            )  # Success! Exit the loop and function with the answer.
-
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            print("Sleeping for 1 minute before retrying...")
-            await asyncio.sleep(60)  # Wait for 60 seconds before the next attempt
+ # Wait for 60 seconds before the next attempt
 
 
 # --- Configuration ---
 # In a real application, this key would be stored securely,
 # for example, in an environment variable.
-API_KEY = "a0fe7533f09d10a50c420dba1534851a96cf628062b3700130e993d677c422ad"
+API_KEY = "50255bc08e08f6431861bace6cb7232a1a9c317758fc6afd177cfd01ba3cff9a"
 BEARER_TOKEN = f"Bearer {API_KEY}"
 
 # --- Pydantic Models for Data Validation ---
@@ -514,7 +577,7 @@ async def handle_hackrx_request(
 
     queries = request_data.questions
 
-    tasks = [process_single_query(ensemble_retriever, llm, query) for query in queries]
+    tasks = [process_single_query(ensemble_retriever, query) for query in queries]
 
     # --- NEW: Execute all tasks concurrently ---
     # asyncio.gather runs all the tasks at the same time and waits for all of them to complete.
