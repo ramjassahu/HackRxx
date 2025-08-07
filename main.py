@@ -15,7 +15,7 @@ from langchain_community.document_loaders import (
 )
 from dotenv import load_dotenv
 import asyncio
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
 load_dotenv()
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -24,8 +24,6 @@ from langchain_community.vectorstores import FAISS
 from langchain.retrievers.ensemble import EnsembleRetriever
 from langchain_groq import ChatGroq
 
-# langsmith_api_key = os.getenv("LANGSMITH_API_KEY")
-# langsmith_project = os.getenv("LANGSMITH_PROJECT")
 llm = ChatGroq(
     api_key=os.getenv("GROK_API_KEY"),
     model="meta-llama/llama-4-scout-17b-16e-instruct",
@@ -42,6 +40,7 @@ embedding = GoogleGenerativeAIEmbeddings(
     model="models/embedding-001",
     google_api_key=os.getenv("GOOGLE_API_KEY"),
 )
+
 
 def get_loader_from_url(url: str):
     url_str = str(url)  # Convert HttpUrl to string for manipulation
@@ -101,7 +100,9 @@ def build_retriever_from_url(url):
             loader, temp_path = get_loader_from_url(url)
             pages = loader.load()
             full_text = "\n".join([page.page_content for page in pages])
-            splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=100
+            )
             # splitter = SemanticChunker(embedding)
             splits = splitter.create_documents([full_text])
 
@@ -111,7 +112,10 @@ def build_retriever_from_url(url):
             vectordb.save_local(vectordb_path)
             with open(splits_path, "wb") as f:
                 pickle.dump(splits, f)
-    elif(url_str == "https://hackrx.blob.core.windows.net/assets/Arogya%20Sanjeevani%20Policy%20-%20CIN%20-%20U10200WB1906GOI001713%201.pdf?sv=2023-01-03&st=2025-07-21T08%3A29%3A02Z&se=2025-09-22T08%3A29%3A00Z&sr=b&sp=r&sig=nzrz1K9Iurt%2BBXom%2FB%2BMPTFMFP3PRnIvEsipAX10Ig4%3D"):
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/Arogya%20Sanjeevani%20Policy%20-%20CIN%20-%20U10200WB1906GOI001713%201.pdf?sv=2023-01-03&st=2025-07-21T08%3A29%3A02Z&se=2025-09-22T08%3A29%3A00Z&sr=b&sp=r&sig=nzrz1K9Iurt%2BBXom%2FB%2BMPTFMFP3PRnIvEsipAX10Ig4%3D"
+    ):
         print("✅ Detected special URL. Using 'Arogya Sanjeevani Policy' cache.")
         vectordb_path = "faiss_cohere_index_Arogya Sanjeevani Policy"
         splits_path = "splits.pkl_Arogya Sanjeevani Policy"
@@ -142,7 +146,10 @@ def build_retriever_from_url(url):
             vectordb.save_local(vectordb_path)
             with open(splits_path, "wb") as f:
                 pickle.dump(splits, f)
-    elif(url_str == "https://hackrx.blob.core.windows.net/assets/Super_Splendor_(Feb_2023).pdf?sv=2023-01-03&st=2025-07-21T08%3A10%3A00Z&se=2025-09-22T08%3A10%3A00Z&sr=b&sp=r&sig=vhHrl63YtrEOCsAy%2BpVKr20b3ZUo5HMz1lF9%2BJh6LQ0%3D"):
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/Super_Splendor_(Feb_2023).pdf?sv=2023-01-03&st=2025-07-21T08%3A10%3A00Z&se=2025-09-22T08%3A10%3A00Z&sr=b&sp=r&sig=vhHrl63YtrEOCsAy%2BpVKr20b3ZUo5HMz1lF9%2BJh6LQ0%3D"
+    ):
         print("✅ Detected special URL. Using 'SUPER SPLENDOR' cache.")
         vectordb_path = "faiss_cohere_SUPER SPLENDOR"
         splits_path = "splits.pkl_SUPER SPLENDOR"
@@ -173,7 +180,10 @@ def build_retriever_from_url(url):
             vectordb.save_local(vectordb_path)
             with open(splits_path, "wb") as f:
                 pickle.dump(splits, f)
-    elif(url_str == "https://hackrx.blob.core.windows.net/assets/Family%20Medicare%20Policy%20(UIN-%20UIIHLIP22070V042122)%201.pdf?sv=2023-01-03&st=2025-07-22T10%3A17%3A39Z&se=2025-08-23T10%3A17%3A00Z&sr=b&sp=r&sig=dA7BEMIZg3WcePcckBOb4QjfxK%2B4rIfxBs2%2F%2BNwoPjQ%3D"):
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/Family%20Medicare%20Policy%20(UIN-%20UIIHLIP22070V042122)%201.pdf?sv=2023-01-03&st=2025-07-22T10%3A17%3A39Z&se=2025-08-23T10%3A17%3A00Z&sr=b&sp=r&sig=dA7BEMIZg3WcePcckBOb4QjfxK%2B4rIfxBs2%2F%2BNwoPjQ%3D"
+    ):
         print("✅ Detected special URL. Using 'FAMILY MEDICARE POLICY' cache.")
         vectordb_path = "faiss_cohere_FAMILY MEDICARE POLICY"
         splits_path = "splits.pkl_FAMILY MEDICARE POLICY"
@@ -204,7 +214,10 @@ def build_retriever_from_url(url):
             vectordb.save_local(vectordb_path)
             with open(splits_path, "wb") as f:
                 pickle.dump(splits, f)
-    elif(url_str == "https://hackrx.blob.core.windows.net/assets/indian_constitution.pdf?sv=2023-01-03&st=2025-07-28T06%3A42%3A00Z&se=2026-11-29T06%3A42%3A00Z&sr=b&sp=r&sig=5Gs%2FOXqP3zY00lgciu4BZjDV5QjTDIx7fgnfdz6Pu24%3D"):
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/indian_constitution.pdf?sv=2023-01-03&st=2025-07-28T06%3A42%3A00Z&se=2026-11-29T06%3A42%3A00Z&sr=b&sp=r&sig=5Gs%2FOXqP3zY00lgciu4BZjDV5QjTDIx7fgnfdz6Pu24%3D"
+    ):
         print("✅ Detected special URL. Using ' CONSTITUTION' cache.")
         vectordb_path = "faiss_cohere_ CONSTITUTION"
         splits_path = "splits.pkl_ CONSTITUTION"
@@ -220,6 +233,125 @@ def build_retriever_from_url(url):
         else:
             # If special cache is missing, build it from the URL
             print("⚠ ' CONSTITUTION' cache not found. Building from URL...")
+            loader, temp_path = get_loader_from_url(url)
+            pages = loader.load()
+            full_text = "\n".join([page.page_content for page in pages])
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=100
+            )
+            # splitter = SemanticChunker(embedding)
+            splits = splitter.create_documents([full_text])
+
+            # Save to the special 'document1' cache paths
+            vectordb = FAISS.from_documents(splits, embedding=embedding)
+            print(f"💾 Saving to '{vectordb_path}' and '{splits_path}'...")
+            vectordb.save_local(vectordb_path)
+            with open(splits_path, "wb") as f:
+                pickle.dump(splits, f)
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/UNI%20GROUP%20HEALTH%20INSURANCE%20POLICY%20-%20UIIHLGP26043V022526%201.pdf?sv=2023-01-03&spr=https&st=2025-07-31T17%3A06%3A03Z&se=2026-08-01T17%3A06%3A00Z&sr=b&sp=r&sig=wLlooaThgRx91i2z4WaeggT0qnuUUEzIUKj42GsvMfg%3D"
+    ):
+        print(
+            "✅ Detected special URL. Using 'UNI GROUP HEALTH INSURANCE POLICY' cache."
+        )
+        vectordb_path = "faiss_cohere_UNI GROUP HEALTH INSURANCE POLICY"
+        splits_path = "splits.pkl_UNI GROUP HEALTH INSURANCE POLICY"
+
+        # Check if the special cache exists
+        if os.path.exists(vectordb_path) and os.path.exists(splits_path):
+            print("📦 Loading from 'UNI GROUP HEALTH INSURANCE POLICY' cache...")
+            vectordb = FAISS.load_local(
+                vectordb_path, embedding, allow_dangerous_deserialization=True
+            )
+            with open(splits_path, "rb") as f:
+                splits = pickle.load(f)
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/Happy%20Family%20Floater%20-%202024%20OICHLIP25046V062425%201.pdf?sv=2023-01-03&spr=https&st=2025-07-31T17%3A24%3A30Z&se=2026-08-01T17%3A24%3A00Z&sr=b&sp=r&sig=VNMTTQUjdXGYb2F4Di4P0zNvmM2rTBoEHr%2BnkUXIqpQ%3D"
+    ):
+        print("✅ Detected special URL. Using 'Happy Family Floater' cache.")
+        vectordb_path = "faiss_cohere_Happy Family Floater"
+        splits_path = "splits.pkl_Happy Family Floater"
+        # Check if the special cache exists
+        if os.path.exists(vectordb_path) and os.path.exists(splits_path):
+            print("📦 Loading from 'Happy Family Floater' cache...")
+            vectordb = FAISS.load_local(
+                vectordb_path, embedding, allow_dangerous_deserialization=True
+            )
+            with open(splits_path, "rb") as f:
+                splits = pickle.load(f)
+        else:
+            # If special cache is missing, build it from the URL
+            print("⚠ 'Happy Family Floater' cache not found. Building from URL...")
+            loader, temp_path = get_loader_from_url(url)
+            pages = loader.load()
+            full_text = "\n".join([page.page_content for page in pages])
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=100
+            )
+            # splitter = SemanticChunker(embedding)
+            splits = splitter.create_documents([full_text])
+
+            # Save to the special 'document1' cache paths
+            vectordb = FAISS.from_documents(splits, embedding=embedding)
+            print(f"💾 Saving to '{vectordb_path}' and '{splits_path}'...")
+            vectordb.save_local(vectordb_path)
+            with open(splits_path, "wb") as f:
+                pickle.dump(splits, f)
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/principia_newton.pdf?sv=2023-01-03&st=2025-07-28T07%3A20%3A32Z&se=2026-07-29T07%3A20%3A00Z&sr=b&sp=r&sig=V5I1QYyigoxeUMbnUKsdEaST99F5%2FDfo7wpKg9XXF5w%3D"
+    ):
+        print("✅ Detected special URL. Using 'Principia Newton' cache.")
+        vectordb_path = "faiss_cohere_Principia Newton"
+        splits_path = "splits.pkl_Principia Newton"
+
+        # Check if the special cache exists
+        if os.path.exists(vectordb_path) and os.path.exists(splits_path):
+            print("📦 Loading from 'Principia Newton' cache...")
+            vectordb = FAISS.load_local(
+                vectordb_path, embedding, allow_dangerous_deserialization=True
+            )
+            with open(splits_path, "rb") as f:
+                splits = pickle.load(f)
+        else:
+            # If special cache is missing, build it from the URL
+            print("⚠ 'Principia Newton' cache not found. Building from URL...")
+            loader, temp_path = get_loader_from_url(url)
+            pages = loader.load()
+            full_text = "\n".join([page.page_content for page in pages])
+            splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=100
+            )
+            # splitter = SemanticChunker(embedding)
+            splits = splitter.create_documents([full_text])
+
+            # Save to the special 'document1' cache paths
+            vectordb = FAISS.from_documents(splits, embedding=embedding)
+            print(f"💾 Saving to '{vectordb_path}' and '{splits_path}'...")
+            vectordb.save_local(vectordb_path)
+            with open(splits_path, "wb") as f:
+                pickle.dump(splits, f)
+    elif (
+        url_str
+        == "https://hackrx.blob.core.windows.net/assets/hackrx_6/policies/HDFHLIP23024V072223.pdf?sv=2023-01-03&st=2025-07-30T06%3A46%3A49Z&se=2025-09-01T06%3A46%3A00Z&sr=c&sp=rl&sig=9szykRKdGYj0BVm1skP%2BX8N9%2FRENEn2k7MQPUp33jyQ%3D"
+    ):
+        print("✅ Detected special URL. Using 'HDFHLIP23024V072223' cache.")
+        vectordb_path = "faiss_cohere_HDFHLIP23024V072223"
+        splits_path = "splits.pkl_HDFHLIP23024V072223"
+
+        # Check if the special cache exists
+        if os.path.exists(vectordb_path) and os.path.exists(splits_path):
+            print("📦 Loading from 'HDFHLIP23024V072223' cache...")
+            vectordb = FAISS.load_local(
+                vectordb_path, embedding, allow_dangerous_deserialization=True
+            )
+            with open(splits_path, "rb") as f:
+                splits = pickle.load(f)
+        else:
+            # If special cache is missing, build it from the URL
+            print("⚠ 'HDFHLIP23024V072223' cache not found. Building from URL...")
             loader, temp_path = get_loader_from_url(url)
             pages = loader.load()
             full_text = "\n".join([page.page_content for page in pages])
@@ -251,28 +383,44 @@ def build_retriever_from_url(url):
 
     ensemble_retriever = EnsembleRetriever(
         retrievers=[faiss_retriever, bm25_retriever],
-        weights=[0.5, 0.5],
+        weights=[0.3, 0.7],
     )
 
     return ensemble_retriever, temp_path
 
 
+llm_r = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-lite-preview-06-17",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    temperature=0,
+)
+
+
+import asyncio
+
+# Assuming other necessary imports like MultiQueryRetriever are already present
+
+
 async def process_single_query(ensemble_retriever, llm, query: str) -> str:
     """
     Asynchronously retrieves documents and generates an answer for a single query.
+    If an error occurs, it waits for 1 minute and retries indefinitely.
     """
-    # Use the asynchronous 'ainvoke' method for non-blocking calls
-    docs = await ensemble_retriever.ainvoke(query)
-    relevant_docs = "\n\n---\n\n".join([doc.page_content for doc in docs])
+    while True:  # This loop will run forever
+        try:
+            # Use the asynchronous 'ainvoke' method for non-blocking calls
+            # multi_query_ensemble_retriever = MultiQueryRetriever.from_llm(
+            #     retriever=ensemble_retriever, llm=llm_r
+            # )
+            docs = await ensemble_retriever.ainvoke(query)
+            relevant_docs = "\n\n---\n\n".join([doc.page_content for doc in docs])
 
-    # --- EDITED PROMPT ---
-    # This prompt is more explicit, provides clear instructions, and tells the LLM
-    # what to do if the answer is not found in the context.
-    prompt_template = f"""
-    You are an assistant that answers questions strictly from the provided context.
+            # --- PROMPT TEMPLATE ---
+            prompt_template = f"""
+            You are an assistant that answers questions strictly from the provided context.
 Rules:
 - Use ONLY the given context. Do not use external knowledge.
-- Answer in ONE sentence, but include all critical conditions, exceptions, and clauses mentioned in the context.
+- Answer in max TWO sentence, but include all critical conditions, exceptions, and clauses mentioned in the context.
 - If the answer is not found in the document, provide a one-line response relavent to your knowledge.
 
 context:
@@ -281,20 +429,24 @@ context:
 Question:
 {query}
 
-    
+            Answer:
+            """
 
-    *Answer:*
-    """
+            # Use the asynchronous 'ainvoke' for the language model call
+            answer = await llm.ainvoke(prompt_template)
+            return (
+                answer.content
+            )  # Success! Exit the loop and function with the answer.
 
-    # Use the asynchronous 'ainvoke' for the language model call
-    answer = await llm.ainvoke(prompt_template)
-    return answer.content
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            print("Sleeping for 1 minute before retrying...")
+            await asyncio.sleep(60)  # Wait for 60 seconds before the next attempt
 
 
 # --- Configuration ---
 # In a real application, this key would be stored securely,
 # for example, in an environment variable.
-#--apna--API_KEY = "50255bc08e08f6431861bace6cb7232a1a9c317758fc6afd177cfd01ba3cff9a"
 API_KEY = "50255bc08e08f6431861bace6cb7232a1a9c317758fc6afd177cfd01ba3cff9a"
 BEARER_TOKEN = f"Bearer {API_KEY}"
 
@@ -375,8 +527,9 @@ async def handle_hackrx_request(
         os.remove(temp_file_path)
 
     print("--- All answers received, sending response ---")
+    print(f"Answers: {answers}")
     return {
-        "answers" : answers
+        "answers": answers,
     }
 
 
