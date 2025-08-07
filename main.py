@@ -25,8 +25,8 @@ from langchain.retrievers.ensemble import EnsembleRetriever
 from langchain_groq import ChatGroq
 
 llm = ChatGroq(
-    api_key=os.getenv("GROK_API_KEY"),
-    model="meta-llama/llama-4-scout-17b-16e-instruct",
+   google_api_key=os.getenv("GOOGLE_API_KEY"),
+    model="gemini-pro",
     temperature=0,
 )
 
